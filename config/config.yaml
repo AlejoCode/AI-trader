@@ -1,0 +1,93 @@
+env: dev
+
+account:
+  broker_name: "Generic-MT5"
+  account_type: "Hedging"
+  leverage: "1:100"
+  commission_model: "spread + commission"
+  equity_usd: 10000  # used for paper; live reads from MT5
+
+symbols:
+  - BTCUSD
+  - ETHUSD
+  - NAS100
+  - XAUUSD
+
+sessions:
+  trade_24x5: true
+  exclude_low_liquidity:
+    enabled: true
+    windows_utc:
+      - { start: "21:58", end: "22:05" }
+      - { start: "22:55", end: "23:10" }
+
+execution:
+  mode: paper   # paper|live
+  min_lot: 0.01
+  max_open_positions: 3
+  max_exposure_per_symbol_pct: 0.5
+  cooldown_seconds_per_symbol: 20
+  spread_guard_points: 25
+  max_slippage_points: 15
+  freeze_level_points: 10
+  price_precision: 2
+  volume_step: 0.01
+
+risk:
+  per_trade_risk_pct: 0.25
+  daily_max_loss_pct: 1.5
+  circuit_breaker:
+    lookback_trades: 30
+    min_hit_rate_pct: 42
+    vol_z_spike: 3.0
+
+edges:
+  mean_reversion_spike:
+    enabled: true
+    horizon_seconds: 5
+    z_entry: 2.0
+    z_exit: 0.4
+    atr_tf: "1m"
+    atr_len: 14
+    tp_mult: 0.9
+    sl_mult: 0.6
+    timeout_seconds: 45
+
+  micro_momentum:
+    enabled: false
+    confirm_volume_upsigma: 1.0
+    trailing_stop_mult: 0.7
+    timeout_seconds: 60
+
+news:
+  enabled: true
+  blackout_minutes_pre: 5
+  blackout_minutes_post: 5
+  source: stub
+  high_impact_keywords:
+    - "NFP"
+    - "FOMC"
+    - "CPI"
+    - "ECB"
+    - "Fed"
+    - "Rate Decision"
+
+ipc:
+  base_url: "http://127.0.0.1:8000"
+  timeout_ms: 120
+
+logging:
+  dir: "logs"
+  level: "INFO"
+  json: true
+  rotate_mb: 50
+  keep_files: 7
+
+alerts:
+  slack_webhook: ""
+  telegram_bot_token: ""
+  telegram_chat_id: ""
+
+infra:
+  vps_note: "Windows VPS near broker DC"
+  mt5_terminal_path: "C:\\Program Files\\MetaTrader 5\\terminal64.exe"
